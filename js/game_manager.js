@@ -77,7 +77,7 @@ GameManager.prototype.addRandomTile = function () {
 };
 
 // Sends the updated grid to the actuator
-GameManager.prototype.actuate = function () {
+GameManager.prototype.actuate = function (callback) {
   if (this.storageManager.getBestScore() < this.score) {
     this.storageManager.setBestScore(this.score);
   }
@@ -95,7 +95,7 @@ GameManager.prototype.actuate = function () {
     won:        this.won,
     bestScore:  this.storageManager.getBestScore(),
     terminated: this.isGameTerminated()
-  }, () => setTimeout(() => this.move(this.artificialPlayer.move()), 200));
+  }, callback);
 };
 
 // Represent the current game as an object
@@ -186,7 +186,10 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
-    this.actuate();
+    this.actuate(() => setTimeout(() => this.move(this.artificialPlayer.move()), 200));
+  }
+  else {
+    this.move(this.artificialPlayer.move());
   }
 };
 
