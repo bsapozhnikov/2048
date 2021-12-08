@@ -3,7 +3,7 @@ function GameManager(size, InputManager, Actuator, StorageManager, ArtificialPla
   this.inputManager   = new InputManager;
   this.storageManager = new StorageManager;
   this.actuator       = new Actuator;
-  this.ArtificialPlayer = new ArtificialPlayer;
+  this.artificialPlayer = new ArtificialPlayer;
 
   this.startTiles     = 2;
 
@@ -95,8 +95,7 @@ GameManager.prototype.actuate = function () {
     won:        this.won,
     bestScore:  this.storageManager.getBestScore(),
     terminated: this.isGameTerminated()
-  });
-
+  }, () => setTimeout(() => this.move(this.artificialPlayer.move()), 200));
 };
 
 // Represent the current game as an object

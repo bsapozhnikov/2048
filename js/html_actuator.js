@@ -7,7 +7,7 @@ function HTMLActuator() {
   this.score = 0;
 }
 
-HTMLActuator.prototype.actuate = function (grid, metadata) {
+HTMLActuator.prototype.actuate = function (grid, metadata, callback) {
   var self = this;
 
   window.requestAnimationFrame(function () {
@@ -32,6 +32,7 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
       }
     }
 
+    if (callback) { callback(); }
   });
 };
 
