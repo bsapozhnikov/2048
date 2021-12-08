@@ -186,10 +186,10 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
-    this.actuate(() => setTimeout(() => this.move(this.artificialPlayer.move()), 200));
+    this.actuate(() => setTimeout(() => this.move(this.artificialPlayer.move(self.grid)), 200));
   }
   else {
-    this.move(this.artificialPlayer.move());
+    this.move(this.artificialPlayer.move(self.grid));
   }
 };
 
