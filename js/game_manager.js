@@ -6,11 +6,14 @@ function GameManager(size, InputManager, Actuator, StorageManager, ArtificialPla
   this.artificialPlayer = new ArtificialPlayer;
 
   this.startTiles     = 2;
+
+  this.playerOn       = true;
   this.playerDelay    = 200;
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  this.inputManager.on("playerPowerToggle", () => this.playerOn = !this.playerOn);
   this.inputManager.on("playerSpeedUp", () => this.playerDelay -= 10);
   this.inputManager.on("playerSlowDown", () => this.playerDelay += 10);
 
@@ -18,10 +21,11 @@ function GameManager(size, InputManager, Actuator, StorageManager, ArtificialPla
 }
 
 // Restart the game
-GameManager.prototype.restart = function () {
+GameManager.prototype.restart = function (callback) {
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
+  if (callback) { callback(); }
 };
 
 // Keep playing after winning (allows going over 2048)
@@ -134,7 +138,12 @@ GameManager.prototype.move = function (direction) {
   // 0: up, 1: right, 2: down, 3: left
   var self = this;
 
-  if (this.isGameTerminated()) return; // Don't do anything if the game's over
+  if (this.isGameTerminated()) {
+    if (this.playerOn) {
+      this.restart(() => setTimeout(() => this.move(this.artificialPlayer.move(self.grid, true)), this.playerDelay));
+    }
+    return;
+  }
 
   var cell, tile;
 
@@ -189,9 +198,9 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
-    this.actuate(() => setTimeout(() => this.move(this.artificialPlayer.move(self.grid, true)), this.playerDelay));
+    this.actuate(() => this.playerOn && setTimeout(() => this.move(this.artificialPlayer.move(self.grid, true)), this.playerDelay));
   }
-  else {
+  else if (this.playerOn) {
     this.move(this.artificialPlayer.move(self.grid, false));
   }
 };

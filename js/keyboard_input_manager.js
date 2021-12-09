@@ -67,11 +67,15 @@ KeyboardInputManager.prototype.listen = function () {
       self.restart.call(self, event);
     }
 
-    if (!modifiers && event.which === 190) {
+    if (!modifiers && event.which === 32) { // ' '
+      event.preventDefault();
+      self.emit("playerPowerToggle");
+    }
+    if (!modifiers && event.which === 190) { // '.'
       event.preventDefault();
       self.emit("playerSpeedUp");
     }
-    if (!modifiers && event.which === 188) {
+    if (!modifiers && event.which === 188) { // ','
       event.preventDefault();
       self.emit("playerSlowDown");
     }
