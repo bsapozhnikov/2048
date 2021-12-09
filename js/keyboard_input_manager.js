@@ -66,6 +66,15 @@ KeyboardInputManager.prototype.listen = function () {
     if (!modifiers && event.which === 82) {
       self.restart.call(self, event);
     }
+
+    if (!modifiers && event.which === 190) {
+      event.preventDefault();
+      self.emit("playerSpeedUp");
+    }
+    if (!modifiers && event.which === 188) {
+      event.preventDefault();
+      self.emit("playerSlowDown");
+    }
   });
 
   // Respond to button presses

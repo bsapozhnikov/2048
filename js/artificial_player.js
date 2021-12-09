@@ -12,7 +12,6 @@ ArtificialPlayer.prototype.move = qLearning;
 function qLearning(grid, didMove) {
   const state = grid.cells.map(row => row.map(tile => tile ? tile.value : 0));
   const [a, v] = this.qMakeBestMove(state);
-  console.log("AP best move", a, v);
   this.updateQ(state, v, didMove);
   this.prevState = state;
   this.prevMove = a;
@@ -24,7 +23,9 @@ ArtificialPlayer.prototype.qMakeBestMove = function(state) {
   var best_value = -Infinity;
   for (var i = 0; i < 4; i++) {
     const value = this.Q[[state, i]] || 0;
-    console.log("AP QMakeBestMove", this.Q, [state, i], value);
+    if (value > 0) {
+      console.log("AP QMakeBestMove", this.Q, [state, i], value);
+    }
     if (value > best_value) {
       best_move = i;
       best_value = value;
@@ -46,10 +47,9 @@ ArtificialPlayer.prototype.updateQ = function(state, value, didMove) {
   }
 
   this.Q[[this.prevState, this.prevMove]] = newQ;
-  console.log("AP update 1", this.prevState, this.prevMove, newQ);
 };
 
-function q_reward(state) {
+function reward_1(state) {
   var r = 0;
   state.forEach(row => row.forEach(v => r += v));
   return r;

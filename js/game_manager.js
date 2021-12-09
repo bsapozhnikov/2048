@@ -6,10 +6,13 @@ function GameManager(size, InputManager, Actuator, StorageManager, ArtificialPla
   this.artificialPlayer = new ArtificialPlayer;
 
   this.startTiles     = 2;
+  this.playerDelay    = 200;
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
+  this.inputManager.on("playerSpeedUp", () => this.playerDelay -= 10);
+  this.inputManager.on("playerSlowDown", () => this.playerDelay += 10);
 
   this.setup();
 }
@@ -186,7 +189,7 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
-    this.actuate(() => setTimeout(() => this.move(this.artificialPlayer.move(self.grid, true)), 200));
+    this.actuate(() => setTimeout(() => this.move(this.artificialPlayer.move(self.grid, true)), this.playerDelay));
   }
   else {
     this.move(this.artificialPlayer.move(self.grid, false));
