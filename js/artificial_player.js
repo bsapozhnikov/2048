@@ -36,7 +36,7 @@ ArtificialPlayer.prototype.qMakeBestMove = function(state) {
 
 ArtificialPlayer.prototype.updateQ = function(state, value, didMove) {
   if (!this.prevState) { return; }
-  const r = q_reward(state);
+  const r = reward_1(state);
   let newQ = r;
   if (!didMove) {
     newQ = -1;
@@ -53,6 +53,13 @@ function reward_1(state) {
   var r = 0;
   state.forEach(row => row.forEach(v => r += v));
   return r;
+}
+
+function reward_2(state) {
+  var sum = 0;
+  var count = 0;
+  state.forEach(row => row.forEach(v => { sum += v; count += Math.min(1, v); }));
+  return sum / count;
 }
 
 function deterministic1() {
