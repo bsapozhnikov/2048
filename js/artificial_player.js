@@ -42,13 +42,7 @@ ArtificialPlayer.prototype.qMakeBestMove = function(state, score) {
   var best_move = 0;
   var best_value = -Infinity;
   for (var i = 0; i < 4; i++) {
-    let value = this.Q[[state, i]];
-    if (value) {
-      console.log("AP QMakeBestMove", state, i, value);
-    }
-    else {
-      value = this.reward(state, score);
-    }
+    let value = this.getValue(state, i) || this.reward(state, score);
     if (value > 0 && false) {
       console.log("AP QMakeBestMove", this.Q, [state, i], value);
     }
@@ -59,6 +53,18 @@ ArtificialPlayer.prototype.qMakeBestMove = function(state, score) {
   }
   return [best_move, best_value];
 };
+
+ArtificialPlayer.prototype.getValue = function(state, i) {
+  let s = state;
+  let value = this.Q[[s, i]];
+  if (value !== undefined) { console.log("AP getValue", s, i, value); return value; }
+
+  s = state[0];
+  value = this.Q[[s, i]];
+  if (value !== undefined) { console.log("AP getValue", s, i, value); return value; }
+
+  return value;
+}
 
 ArtificialPlayer.prototype.updateQ = function(state, value, score, didMove) {
   if (!this.prevState) { return; }
@@ -73,6 +79,13 @@ ArtificialPlayer.prototype.updateQ = function(state, value, score, didMove) {
   }
 
   this.Q[[this.prevState, this.prevMove]] = newQ;
+  if (this.Q[[this.prevState[0], this.prevMove]]) {
+    this.Q[[this.prevState[0], this.prevMove]] += newQ;
+    this.Q[[this.prevState[0], this.prevMove]] /= 2;
+  }
+  else {
+    this.Q[[this.prevState[0], this.prevMove]] = newQ;
+  }
 };
 
 ArtificialPlayer.prototype.updateParams = function() {
