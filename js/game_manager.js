@@ -140,7 +140,7 @@ GameManager.prototype.move = function (direction) {
 
   if (this.isGameTerminated()) {
     if (this.playerOn) {
-      this.restart(() => setTimeout(() => this.move(this.artificialPlayer.move(self.grid, true)), this.playerDelay));
+      this.restart(() => setTimeout(() => this.handleArtificialPlayerMove(this.artificialPlayer.move(self.grid, self.score, true)), this.playerDelay));
     }
     return;
   }
@@ -198,11 +198,19 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
-    this.actuate(() => this.playerOn && setTimeout(() => this.move(this.artificialPlayer.move(self.grid, true)), this.playerDelay));
+    this.actuate(() => this.playerOn && setTimeout(() => this.handleArtificialPlayerMove(this.artificialPlayer.move(self.grid, self.score, true)), this.playerDelay));
   }
   else if (this.playerOn) {
-    this.move(this.artificialPlayer.move(self.grid, false));
+    this.handleArtificialPlayerMove(this.artificialPlayer.move(self.grid, self.score, false));
   }
+};
+
+GameManager.prototype.handleArtificialPlayerMove = function({ move, shouldRestart }) {
+  if (shouldRestart) {
+    this.over = true;
+  }
+
+  this.move(move);
 };
 
 // Get the vector representing the chosen direction
