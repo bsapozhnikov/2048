@@ -7,7 +7,9 @@ function ArtificialPlayer() {
   this.prevScore = 0;
   this.noise = 0.5;
   this.numMoves = 0;
-  this.stageGoal = 256;
+  this.stageGoal = 512;
+  this.numTimesGoalAchieved = 0;
+  this.goalAchievementsUntilNextStage = 16;
 }
 
 // 0: up, 1: right, 2: down, 3: left
@@ -15,6 +17,13 @@ ArtificialPlayer.prototype.move = qLearning;
 
 function qLearning(grid, score, didMove) {
   if (score > this.stageGoal) {
+    this.numTimesGoalAchieved++;
+    //console.log("AP qLearning achieved stage goal of", this.stageGoal, this.numTimesGoalAchieved, "times");
+    if (this.numTimesGoalAchieved > this.goalAchievementsUntilNextStage) {
+      this.stageGoal *= 2;
+      this.numTimesGoalAchieved = 0;
+      console.log("AP qLearning unlocked next stage; new goal: ", this.stageGoal);
+    }
     return { shouldRestart: true };
   }
 
@@ -24,7 +33,7 @@ function qLearning(grid, score, didMove) {
 
   if (Math.random() < this.noise) {
     const a2 = Math.floor(Math.random() * 4);
-    console.log("AP qLearning adding noise", a, a2);
+    //console.log("AP qLearning adding noise", a, a2);
     a = a2;
   }
 
@@ -57,14 +66,20 @@ ArtificialPlayer.prototype.qMakeBestMove = function(state, score) {
 ArtificialPlayer.prototype.getValue = function(state, i) {
   let s = state;
   let value = this.Q[[s, i]];
-  if (value !== undefined) { console.log("AP getValue", s, i, value); return value; }
+  if (value !== undefined) { return value; }
 
-  s = state[0];
-  value = this.Q[[s, i]];
-  if (value !== undefined) { console.log("AP getValue", s, i, value); return value; }
+  const states = this.getSmallerStates(state);
+  for(var j = 0; j < states.length; j++) {
+    s = states[j];
+    value = this.Q[[s, i]];
+    if (value !== undefined) {
+      //console.log("AP getValue", s, i, value);
+      return value;
+    }
+  }
 
-  return value;
-}
+  return undefined;
+};
 
 ArtificialPlayer.prototype.updateQ = function(state, value, score, didMove) {
   if (!this.prevState) { return; }
@@ -79,14 +94,23 @@ ArtificialPlayer.prototype.updateQ = function(state, value, score, didMove) {
   }
 
   this.Q[[this.prevState, this.prevMove]] = newQ;
-  if (this.Q[[this.prevState[0], this.prevMove]]) {
-    this.Q[[this.prevState[0], this.prevMove]] += newQ;
-    this.Q[[this.prevState[0], this.prevMove]] /= 2;
-  }
-  else {
-    this.Q[[this.prevState[0], this.prevMove]] = newQ;
-  }
+  this.getSmallerStates(this.prevState).forEach((s) => {
+    if (this.Q[[s, this.prevMove]]) {
+      this.Q[[s, this.prevMove]] += newQ;
+      this.Q[[s, this.prevMove]] /= 2;
+    }
+    else {
+      this.Q[[s, this.prevMove]] = newQ;
+    }
+  });
 };
+
+ArtificialPlayer.prototype.getSmallerStates = function(state) {
+  return [
+    state.slice(0, 2),
+    state[0]
+  ];
+}
 
 ArtificialPlayer.prototype.updateParams = function() {
   if (this.numMoves % 1000 == 0) {
