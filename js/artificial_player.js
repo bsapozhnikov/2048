@@ -107,8 +107,9 @@ ArtificialPlayer.prototype.updateQ = function(state, value, score, didMove) {
 
 ArtificialPlayer.prototype.getSmallerStates = function(state) {
   return [
+    state.slice(0, 3),
     state.slice(0, 2),
-    state[0]
+    [state[0]]
   ];
 }
 

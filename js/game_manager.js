@@ -1,9 +1,10 @@
-function GameManager(size, InputManager, Actuator, StorageManager, ArtificialPlayer) {
+function GameManager(size, InputManager, Actuator, StorageManager, ArtificialPlayer, StatsManager) {
   this.size           = size; // Size of the grid
   this.inputManager   = new InputManager;
   this.storageManager = new StorageManager;
   this.actuator       = new Actuator;
   this.artificialPlayer = new ArtificialPlayer;
+  this.statsManager = new StatsManager;
 
   this.startTiles     = 2;
 
@@ -22,6 +23,7 @@ function GameManager(size, InputManager, Actuator, StorageManager, ArtificialPla
 
 // Restart the game
 GameManager.prototype.restart = function (callback) {
+  this.statsManager.pushResult(this.score);
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
